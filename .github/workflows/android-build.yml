@@ -1,0 +1,50 @@
+name: ARCEUS Android Build
+
+on:
+  push:
+    branches:
+      - arceus/main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Android ARM64
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK and CMake
+        run: |
+          sdkmanager --install \
+            "ndk;28.2.13676358" \
+            "cmake;3.31.5"
+
+      - name: Build optimized Eden APK
+        run: |
+          chmod +x .ci/android/build.sh
+          ./.ci/android/build.sh -t optimized -b Release
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARCEUS-Eden-Android-ARM64
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 14
