@@ -1,117 +1,221 @@
-<div align="center">
+::: {align="center"}
+`<img src="leafeon.png" alt="Leafeon — mascote visual do ARCEUS" width="180" />`{=html}
 
 # ⚡ ARCEUS
 
-**Um projeto dedicado de emulação para Android focado inteiramente em Pokémon Legends: Arceus.**
+### Pokémon Legends: Arceus --- Android project
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Plataforma-Android-3DDC84?style=flat-square&logo=android&logoColor=white" />
-  <img src="https://img.shields.io/badge/Linguagem-Kotlin%20%7C%20C%2B%2B-blue?style=flat-square" />
-  <img src="https://img.shields.io/badge/Build-Gradle-02303A?style=flat-square&logo=gradle" />
-  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-orange?style=flat-square" />
+**Um projeto experimental de emulação para Android, dedicado a uma
+experiência focada em Pokémon Legends: Arceus.**
+
+```{=html}
+<p>
+```
+`<img src="https://img.shields.io/badge/Plataforma-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />`{=html}
+`<img src="https://img.shields.io/badge/Kotlin%20%7C%20C%2B%2B-Linguagens-7F52FF?style=for-the-badge" alt="Kotlin e C++" />`{=html}
+`<img src="https://img.shields.io/badge/Build-Gradle-02303A?style=for-the-badge&logo=gradle" alt="Gradle" />`{=html}
+`<img src="https://img.shields.io/badge/Status-Experimental-orange?style=for-the-badge" alt="Experimental" />`{=html}
+```{=html}
 </p>
+```
+[**Código-fonte**](https://github.com/srnanoki/Legends-arceus-port) ·
+[**Issues**](https://github.com/srnanoki/Legends-arceus-port/issues) ·
+[**Actions /
+Builds**](https://github.com/srnanoki/Legends-arceus-port/actions)
+:::
 
-</div>
+------------------------------------------------------------------------
 
----
+## 🌿 Sobre o projeto
 
-## 📖 Sobre o Projeto
+O **ARCEUS** é um projeto independente baseado no código-fonte do **Eden
+Emulator**, com foco em uma experiência Android dedicada a *Pokémon
+Legends: Arceus*.
 
-O **ARCEUS** é um projeto de emulação experimental derivado do código-fonte do emulador **Eden**, desenvolvido com um objetivo claro: proporcionar uma experiência focada e otimizada exclusivamente para rodar **Pokémon Legends: Arceus** no Android.
+A proposta é adaptar a interface e os fluxos do aplicativo para tornar a
+configuração, a organização dos arquivos e o acesso ao jogo mais diretos
+em dispositivos móveis --- preservando o núcleo de emulação e os
+componentes nativos herdados do projeto upstream.
 
-Diferente de emuladores tradicionais projetados como bibliotecas gerais de jogos, o ARCEUS busca simplificar a interface, remover complexidades desnecessárias e introduzir melhorias de usabilidade e desempenho voltadas especificamente para dispositivos móveis.
+> **Importante:** o ARCEUS ainda está em desenvolvimento experimental.
+> Uma compilação bem-sucedida não significa, por si só, que o jogo
+> esteja totalmente funcional ou tenha desempenho ideal em todos os
+> aparelhos.
 
----
+## ✨ Objetivos
 
-## 🎯 Objetivos
+-   🎮 **Experiência dedicada:** interface e navegação orientadas a
+    Pokémon Legends: Arceus.
+-   📱 **Usabilidade móvel:** controles e telas pensados para Android.
+-   🧩 **Núcleo preservado:** manter o motor de emulação e os
+    componentes essenciais do Eden.
+-   ⚙️ **Configuração real:** conectar as opções da interface às
+    configurações efetivamente suportadas pelo emulador.
+-   🚀 **Desempenho:** facilitar o acesso às opções gráficas e de
+    compatibilidade disponíveis no dispositivo.
+-   🔍 **Transparência:** distinguir recursos implementados, em teste e
+    planejados.
 
-- **Foco Único:** Criar uma experiência Android dedicada e refinada para *Pokémon Legends: Arceus*.
-- **Simplificação:** Tornar o processo de seleção e inicialização de jogos muito mais direto e prático.
-- **Núcleo Robusto:** Preservar o núcleo de emulação original e suas funcionalidades essenciais herdadas do upstream.
-- **Desempenho Gráfico:** Manter opções úteis de gráficos e performance, incluindo suporte integrado ao *Lossless Scaling*.
-- **Interface Otimizada:** Melhorar a navegação e a experiência do usuário em telas sensíveis ao toque.
-- **Transparência:** Manter um processo de desenvolvimento aberto e colaborativo.
+## 📊 Estado do desenvolvimento
 
----
+Os estados abaixo representam o andamento conhecido do projeto; não são
+uma garantia de compatibilidade ou desempenho.
 
-## 🛠️ Tecnologias Utilizadas
+  -----------------------------------------------------------------------
+  Área                                          Estado
+  -------------------------- --------------------------------------------
+  Projeto Android e sistema             🟢 Estrutura existente
+  de build                   
 
-| Componente | Tecnologia |
-| :--- | :--- |
-| **Aplicativo Android** | Kotlin |
-| **Núcleo de Emulação Nativo** | C++ |
-| **Interface Gráfica** | Framework UI Nativo do Android |
-| **Sistema de Build** | Gradle |
-| **Compilação Nativa** | CMake |
-| **Automação & CI/CD** | GitHub Actions |
+  Build Android via GitHub     🟢 Build 0.0.3 reportada como concluída
+  Actions                    
 
----
+  Núcleo de emulação herdado         🔵 Preservado no código-base
+  do Eden                    
 
-## 📊 Status do Desenvolvimento
+  Interface dedicada ARCEUS             🟡 Em desenvolvimento
 
-> **⚠️ Nota:** O ARCEUS encontra-se em estágio **experimental**. O status abaixo descreve o progresso atual da aplicação, não garantindo que o jogo rode com velocidade máxima em todos os dispositivos.
+  Navegação e gerenciamento              🟡 Em aprimoramento
+  de arquivos                
 
-| Funcionalidade | Status |
-| :--- | :---: |
-| Build do aplicativo Android | 🟢 Funcionando |
-| Geração de APK ARM64 | 🟢 Funcionando |
-| Núcleo de emulação original | 🔵 Preservado do upstream |
-| Suporte ao Lossless Scaling | 🔵 Presente no código base |
-| Interface dedicada ao jogo | 🟡 Em desenvolvimento |
-| Inicialização simplificada direta | ⏳ Planejado |
-| Manipulação de arquivos e pastas | 🟡 Em aprimoramento |
-| Testes de compatibilidade e performance | 🔄 Contínuo |
+  Configurações gráficas             🟡 Em integração e validação
+  integradas ao motor        
 
----
+  Importação e validação de         🟡 A validar no fluxo dedicado
+  firmware/keys              
 
-## 📥 Instalação
+  Inicialização do jogo no              🧪 Testes necessários
+  dispositivo                
 
-As builds de desenvolvimento mais recentes são disponibilizadas automaticamente através dos artefatos do **GitHub Actions**.
+  Compatibilidade e                      🔄 Testes contínuos
+  desempenho por aparelho    
+  -----------------------------------------------------------------------
 
-1. Acesse a aba **Actions** do repositório.
-2. Selecione o workflow de build para Android.
-3. Clique em uma execução de build bem-sucedida (`success`).
-4. Role até a seção de artefatos e baixe o APK gerado.
-5. Extraia o arquivo (se necessário) e instale o APK em um dispositivo Android compatível.
+**Legenda:** 🟢 disponível/confirmado · 🔵 herdado do projeto-base · 🟡
+em desenvolvimento · 🧪 precisa de validação · 🔄 trabalho contínuo.
 
-> 💡 **Aviso Legal:** Utilize apenas arquivos de jogos e arquivos de sistema que você possua legalmente. O ARCEUS **não** distribui ROMs de *Pokémon Legends: Arceus*, chaves de criptografia (keys), firmware ou qualquer conteúdo protegido por direitos autorais.
+## 🛠️ Tecnologias
 
----
+  Componente           Tecnologia
+  -------------------- ---------------------------------------------------------
+  Aplicativo Android   Kotlin
+  Núcleo nativo        C++
+  Interface            Android / Jetpack Compose e componentes do projeto-base
+  Build                Gradle
+  Compilação nativa    CMake
+  Automação            GitHub Actions
 
-## 📱 Requisitos de Hardware e Compatibilidade
+## 📲 Instalação de builds de desenvolvimento
 
-A compatibilidade e o desempenho dependem diretamente de fatores como:
-- Especificações do dispositivo Android (SoC e arquitetura).
-- Suporte e otimização dos drivers de GPU.
-- Memória RAM disponível.
-- Configurações aplicadas no emulador e versão do jogo.
+As builds automatizadas, quando disponíveis, podem ser consultadas na
+aba **Actions**:
 
-Uma compilação de APK bem-sucedida **não** garante jogabilidade fluida ou total funcionalidade. Os testes de compatibilidade continuam ativamente em andamento.
+1.  Abra [GitHub
+    Actions](https://github.com/srnanoki/Legends-arceus-port/actions).
+2.  Selecione o workflow de compilação Android.
+3.  Abra uma execução concluída com sucesso.
+4.  Na seção **Artifacts**, baixe o APK disponibilizado.
+5.  Instale o APK em um dispositivo Android compatível. Talvez seja
+    necessário autorizar a instalação de aplicativos dessa origem nas
+    configurações do Android.
 
----
+> Baixe somente artefatos publicados pelo repositório oficial e confira
+> se a execução terminou com sucesso.
 
-## 🤝 Créditos e Agradecimentos
+## 📦 Firmware, chaves e jogos
 
-O ARCEUS é um projeto independente que herda código e componentes do projeto **Eden Emulator**. 
+O ARCEUS não inclui firmware, chaves criptográficas ou cópias de jogos.
 
-Agradecemos imensamente aos desenvolvedores e contribuidores do Eden e de todos os projetos open-source dos quais ele deriva. Os avisos de direitos autorais originais, cabeçalhos de licença e atribuições de terceiros são rigorosamente mantidos no código-fonte.
+-   Use somente arquivos obtidos legalmente e que você tenha direito de
+    utilizar.
+-   Importe os arquivos pelo próprio aplicativo, quando os respectivos
+    fluxos estiverem disponíveis.
+-   Não publique firmware, `prod.keys`, `title.keys`, jogos, saves ou
+    outros arquivos pessoais no GitHub.
+-   A disponibilidade de um seletor de arquivos não significa, por si
+    só, que a instalação ou validação tenha sido concluída.
 
----
+## ⚙️ Gráficos, drivers e desempenho
 
-## 📜 Isenção de Responsabilidade (Disclaimer)
+O desempenho depende de diversos fatores, incluindo chipset, GPU, driver
+gráfico, memória disponível, versão do Android e estado de
+compatibilidade do jogo.
 
-O ARCEUS é um projeto independente desenvolvido pela comunidade. **Não** é afiliado, endossado, patrocinado ou associado de forma alguma à **Nintendo**, **The Pokémon Company**, **Game Freak** ou aos desenvolvedores do **Eden Emulator**.
+As opções de resolução, anti-aliasing, backend/renderizador e drivers
+devem ser consideradas funcionais somente quando estiverem conectadas ao
+motor de emulação e tiverem sido testadas. A presença de uma opção na
+interface não é prova de que ela esteja sendo aplicada.
 
-Todas as marcas registradas e propriedade intelectual pertencem aos seus respectivos proprietários.
+Drivers gráficos externos ou alternativos devem ser usados apenas quando
+forem compatíveis com o dispositivo e com a versão do emulador. Uma
+configuração inadequada pode causar falhas, artefatos visuais ou
+encerramentos inesperados.
 
----
+## 📱 Compatibilidade
+
+Não existe garantia de que todos os dispositivos Android consigam
+executar o jogo. A compatibilidade pode variar conforme:
+
+-   SoC e arquitetura do processador;
+-   GPU e versão do driver;
+-   memória RAM disponível;
+-   versão do Android;
+-   versão do jogo e arquivos de sistema utilizados;
+-   configurações do emulador.
+
+Relatos de testes são bem-vindos. Ao informar um problema, inclua o
+modelo do aparelho, versão do Android, versão/build do ARCEUS e um log
+relevante --- **sem anexar keys, firmware, jogos ou dados pessoais**.
+
+## 🧑‍💻 Desenvolvimento
+
+O projeto utiliza Gradle para o aplicativo Android e CMake para partes
+nativas. O workflow de CI fica em:
+
+``` text
+.github/workflows/android-build.yml
+```
+
+Para contribuir, abra uma
+[Issue](https://github.com/srnanoki/Legends-arceus-port/issues)
+descrevendo o problema ou a melhoria proposta. Antes de enviar
+alterações, preserve os avisos de copyright, cabeçalhos de licença e
+atribuições presentes nos arquivos originais.
+
+## 🙏 Créditos e agradecimentos
+
+O ARCEUS é um projeto independente que utiliza código e componentes do
+**Eden Emulator** e de outros projetos de código aberto.
+
+Todo crédito, aviso de copyright, licença e atribuição de terceiros deve
+permanecer associado aos respectivos componentes. Consulte os arquivos
+de licença e os cabeçalhos do código-fonte para conhecer os termos
+aplicáveis.
+
+## ⚖️ Aviso legal
+
+ARCEUS é um projeto independente e **não é afiliado, endossado,
+patrocinado ou associado** à Nintendo, The Pokémon Company, Game Freak
+ou aos desenvolvedores do Eden Emulator.
+
+Pokémon e demais marcas citadas pertencem aos seus respectivos
+titulares. O projeto não distribui ROMs, jogos, firmware ou chaves
+criptográficas.
 
 ## 📄 Licença
 
-Este projeto herda as obrigações de licenciamento de seu código-fonte upstream. Consulte o arquivo `LICENSE` no repositório e os cabeçalhos individuais dos arquivos de código para verificar os termos de licença aplicáveis.
+O projeto incorpora código de terceiros e herda as obrigações de
+licenciamento aplicáveis a esses componentes. Consulte o arquivo
+`LICENSE` e os cabeçalhos individuais dos arquivos para identificar os
+termos correspondentes. Não presuma que todo o conteúdo do repositório
+esteja coberto por uma única licença sem verificar suas origens.
 
----
+------------------------------------------------------------------------
 
-<p align="center">
-  <strong>ARCEUS — Um jogo. Uma experiência focada.</strong>
-</p>
+::: {align="center"}
+### ⚡ ARCEUS
+
+**Um jogo. Uma experiência focada.**
+
+*Feito com dedicação pela comunidade.*
+:::
