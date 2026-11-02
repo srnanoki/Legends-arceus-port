@@ -299,25 +299,61 @@ private fun getPlayerIndex(): Int =
     }
 
     private fun showPathPickerDialog() {
-        directoryPickerLauncher.launch(null)
+        val pathSetting = settingsViewModel.clickedItem as? PathSetting ?: return
+        val root = Environment.getExternalStorageDirectory()
+        val current = File(pathSetting.getCurrentPath())
+        val start = if (current.isDirectory && current.canRead() &&
+            (current.absolutePath == root.absolutePath ||
+                current.absolutePath.startsWith(root.absolutePath + File.separator))
+        ) current else root
+        showInternalDirectoryPicker(pathSetting, start, root)
     }
 
-    private val directoryPickerLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenDocumentTree()
-    ) { uri ->
-        if (uri != null) {
-            val pathSetting = settingsViewModel.clickedItem as? PathSetting ?: return@registerForActivityResult
-            val rawPath = PathUtil.getPathFromUri(uri)
-            if (rawPath != null) {
-                handleSelectedPath(pathSetting, rawPath)
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    R.string.invalid_directory,
-                    Toast.LENGTH_SHORT
-                ).show()
+    private fun showInternalDirectoryPicker(
+        pathSetting: PathSetting,
+        directory: File,
+        root: File
+    ) {
+        val rootPath = root.canonicalFile.absolutePath
+        val currentPath = directory.canonicalFile.absolutePath
+        if (currentPath != rootPath &&
+            !currentPath.startsWith(rootPath + File.separator)
+        ) {
+            Toast.makeText(requireContext(), R.string.invalid_directory, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val entries = directory.listFiles()
+            ?.filter { it.isDirectory || it.isFile }
+            ?.sortedWith(compareBy<File> { !it.isDirectory }.thenBy { it.name.lowercase() })
+            ?: emptyList()
+
+        val labels = entries.map {
+            if (it.isDirectory) "📁 ${it.name}/" else "📄 ${it.name}"
+        }.toTypedArray()
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(directory.absolutePath)
+            .setItems(labels) { _, which ->
+                val selected = entries[which]
+                if (selected.isDirectory) {
+                    showInternalDirectoryPicker(pathSetting, selected, root)
+                }
+            }
+            .setPositiveButton("Usar esta pasta") { _, _ ->
+                handleSelectedPath(pathSetting, directory.absolutePath)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+
+        if (currentPath != rootPath) {
+            dialog.setNeutralButton("Voltar") { _, _ ->
+                directory.parentFile?.let {
+                    showInternalDirectoryPicker(pathSetting, it, root)
+                }
             }
         }
+
+        dialog.show()
     }
 
     private fun handleSelectedPath(pathSetting: PathSetting, path: String) {

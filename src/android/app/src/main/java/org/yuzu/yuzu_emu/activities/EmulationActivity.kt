@@ -66,6 +66,7 @@ import org.yuzu.yuzu_emu.utils.ParamPackage
 import org.yuzu.yuzu_emu.utils.ThemeHelper
 import java.text.NumberFormat
 import kotlin.math.roundToInt
+import org.yuzu.yuzu_emu.utils.FullscreenHelper
 import org.yuzu.yuzu_emu.utils.ForegroundService
 import androidx.core.os.BundleCompat
 
@@ -245,12 +246,20 @@ class EmulationActivity : AppCompatActivity(), SensorEventListener, InputManager
 
     override fun onResume() {
         super.onResume()
+        FullscreenHelper.applyToActivity(this)
         nfcReader.startScanning()
         startMotionSensorListener()
         InputHandler.updateControllerData()
         notifyPhysicalControllerState()
 
         buildPictureInPictureParams()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            FullscreenHelper.applyToActivity(this)
+        }
     }
 
     override fun onPause() {

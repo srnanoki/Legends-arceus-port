@@ -67,3 +67,9 @@ vulkansdk*.exe
 
 # Build-time generated external sources
 externals/generated
+
+# ARCEUS local backups
+*.bak
+*.backup
+*.before-picker-fix
+arceus-backups/

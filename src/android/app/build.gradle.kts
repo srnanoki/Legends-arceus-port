@@ -72,7 +72,7 @@ android {
         applicationId = "dev.eden.eden_emulator"
         minSdk = 24
         targetSdk = 36
-        versionName = getGitVersion()
+        versionName = "0.0.3"
         versionCode = autoVersion
 
         externalNativeBuild {
@@ -179,10 +179,10 @@ android {
             signingConfig = signingConfigs.getByName("default")
             isDebuggable = true
             isJniDebuggable = true
-            versionNameSuffix = "-debug"
+            versionNameSuffix = ""
             applicationIdSuffix = ".debug"
 
-            manifestPlaceholders += mapOf("appNameSuffix" to " Debug")
+            manifestPlaceholders += mapOf("appNameSuffix" to "")
         }
     }
 
@@ -195,7 +195,7 @@ android {
             isDefault = true
             minSdk = 33
 
-            manifestPlaceholders += mapOf("appNameBase" to "Eden")
+            manifestPlaceholders += mapOf("appNameBase" to "Pokémon Legends: Arceus port")
             resValue("string", "app_name_suffixed", "Eden")
 
             ndk {
@@ -275,7 +275,7 @@ android {
 
         // apply nightly suffix I/A
         resValue("string", "app_name_suffixed", "$currentName$suffix")
-        resValue("string", "app_name", "Eden$suffix")
+        resValue("string", "app_name", "$currentName$suffix")
     }
 
     sourceSets {
