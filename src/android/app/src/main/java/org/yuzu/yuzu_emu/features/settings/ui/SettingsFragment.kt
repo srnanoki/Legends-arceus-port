@@ -64,6 +64,22 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private val settingsAllFilesPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (!hasAllFilesPermission()) {
+            Toast.makeText(
+                requireContext(),
+                R.string.all_files_permission_required,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        if (::presenter.isInitialized) {
+            presenter.loadSettingsList()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true)
@@ -95,7 +111,9 @@ class SettingsFragment : Fragment() {
             settingsViewModel,
             settingsAdapter!!,
             args.menuTag,
-            activity
+            activity,
+            hasAllFilesPermission(),
+            { requestAllFilesPermissionFromSettings() }
         )
 
         val toolbarTitle = resolveToolbarTitle()
@@ -232,6 +250,13 @@ private fun getPlayerIndex(): Int =
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::presenter.isInitialized) {
+            presenter.loadSettingsList()
+        }
+    }
+
     private fun hasAllFilesPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
@@ -245,6 +270,16 @@ private fun getPlayerIndex(): Int =
             val intent = Intent(AndroidSettings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
             intent.data = "package:${requireContext().packageName}".toUri()
             requestAllFilesPermissionLauncher.launch(intent)
+        }
+    }
+
+    private fun requestAllFilesPermissionFromSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val intent = Intent(
+                AndroidSettings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
+            )
+            intent.data = "package:${requireContext().packageName}".toUri()
+            settingsAllFilesPermissionLauncher.launch(intent)
         }
     }
 

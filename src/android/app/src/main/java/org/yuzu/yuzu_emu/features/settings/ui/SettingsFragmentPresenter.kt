@@ -42,7 +42,9 @@ class SettingsFragmentPresenter(
     private val settingsViewModel: SettingsViewModel,
     private val adapter: SettingsAdapter,
     private var menuTag: MenuTag,
-    private var activity: FragmentActivity?
+    private var activity: FragmentActivity?,
+    private val hasAllFilesAccess: Boolean,
+    private val onRequestAllFilesAccess: () -> Unit
 ) {
     private var settingsList = ArrayList<SettingsItem>()
 
@@ -482,6 +484,20 @@ class SettingsFragmentPresenter(
                     )
                 )
             }
+            add(
+                RunnableSetting(
+                    titleString = "Acesso a todos os arquivos",
+                    descriptionString = if (hasAllFilesAccess) {
+                        "Permissão concedida"
+                    } else {
+                        "Toque para abrir as configurações e conceder acesso"
+                    },
+                    isRunnable = !NativeLibrary.isRunning(),
+                    iconId = R.drawable.ic_folder_open,
+                    runnable = onRequestAllFilesAccess
+                )
+            )
+
             add(
                 RunnableSetting(
                     titleId = R.string.reset_to_default,
