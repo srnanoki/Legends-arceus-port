@@ -120,32 +120,42 @@ object FileUtil {
             DocumentsContract.Document.COLUMN_DISPLAY_NAME,
             DocumentsContract.Document.COLUMN_MIME_TYPE
         )
-        var c: Cursor? = null
-        val results: MutableList<MinimalDocumentFile> = ArrayList()
+        val results = mutableListOf<MinimalDocumentFile>()
+        var cursor: Cursor? = null
+
         try {
-            val docId: String = if (isRootTreeUri(uri)) {
+            val docId = if (isRootTreeUri(uri)) {
                 DocumentsContract.getTreeDocumentId(uri)
             } else {
                 DocumentsContract.getDocumentId(uri)
             }
-            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, docId)
-            c = resolver.query(childrenUri, columns, null, null, null)
-            while (c!!.moveToNext()) {
-                val documentId = c.getString(0)
-                val documentName = c.getString(1)
-                val documentMimeType = c.getString(2)
-                val documentUri = DocumentsContract.buildDocumentUriUsingTree(uri, documentId)
-                val document = MinimalDocumentFile(documentName, documentMimeType, documentUri)
-                results.add(document)
+            val childrenUri =
+                DocumentsContract.buildChildDocumentsUriUsingTree(uri, docId)
+
+            cursor = resolver.query(childrenUri, columns, null, null, null)
+            if (cursor == null) {
+                Log.error("[FileUtil]: Cannot list files: query returned null")
+                return emptyArray()
+            }
+
+            while (cursor.moveToNext()) {
+                val documentId = cursor.getString(0) ?: continue
+                val documentName = cursor.getString(1) ?: continue
+                val documentMimeType = cursor.getString(2) ?: continue
+                val documentUri =
+                    DocumentsContract.buildDocumentUriUsingTree(uri, documentId)
+                results.add(
+                    MinimalDocumentFile(documentName, documentMimeType, documentUri)
+                )
             }
         } catch (e: Exception) {
-            Log.error("[FileUtil]: Cannot list file error: " + e.message)
+            Log.error("[FileUtil]: Cannot list files: ${e.message}")
         } finally {
-            closeQuietly(c)
+            closeQuietly(cursor)
         }
+
         return results.toTypedArray()
     }
-
     /**
      * Check whether given path exists.
      * @param path Native content uri path
@@ -491,21 +501,28 @@ object FileUtil {
 
     fun isTreeUriValid(uri: Uri): Boolean {
         val resolver = context.contentResolver
-        val columns = arrayOf(
-            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-            DocumentsContract.Document.COLUMN_MIME_TYPE
-        )
+
         return try {
-            val docId: String = if (isRootTreeUri(uri)) {
+            val docId = if (isRootTreeUri(uri)) {
                 DocumentsContract.getTreeDocumentId(uri)
             } else {
                 DocumentsContract.getDocumentId(uri)
             }
-            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, docId)
-            resolver.query(childrenUri, columns, null, null, null)
-            true
-        } catch (_: Exception) {
+
+            val childrenUri =
+                DocumentsContract.buildChildDocumentsUriUsingTree(uri, docId)
+
+            resolver.query(
+                childrenUri,
+                arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID),
+                null,
+                null,
+                null
+            )?.use {
+                true
+            } ?: false
+        } catch (e: Exception) {
+            Log.error("[FileUtil]: Invalid tree URI: ${e.message}")
             false
         }
     }
