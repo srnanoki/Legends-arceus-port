@@ -1,5 +1,7 @@
 package com.arceusmobile
 
+import org.yuzu.yuzu_emu.R
+
 import android.content.Intent
 import android.net.Uri
 
@@ -31,6 +33,7 @@ private val Sidebar = Color(0xFF171220)
 private val Muted = Color(0xFFB9ADC8)
 private val Good = Color(0xFF8FE0B0)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArceusApp() {
     val context = androidx.compose.ui.platform.LocalContext.current
