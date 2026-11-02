@@ -1,5 +1,38 @@
+package com.arceusmobile
+
+import android.content.Intent
+import android.net.Uri
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.platform.LocalContext
+
+private val Purple = Color(0xFFB78AF7)
+private val Deep = Color(0xFF100D18)
+private val Panel = Color(0xFF1D1828)
+private val PanelAlt = Color(0xFF292137)
+private val Sidebar = Color(0xFF171220)
+private val Muted = Color(0xFFB9ADC8)
+private val Good = Color(0xFF8FE0B0)
+
 @Composable
-internal fun ArceusApp() {
+fun ArceusApp() {
     val context = androidx.compose.ui.platform.LocalContext.current
     val prefs = remember { context.getSharedPreferences("arceus_prefs", 0) }
 
