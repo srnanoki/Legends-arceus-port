@@ -70,7 +70,21 @@ fun ArceusApp() {
         uri?.let { persistUri("game_uri", it); selectedGame = it.toString(); status = "Arquivo do jogo selecionado." }
     }
     val keysPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let { persistUri("keys_uri", it); selectedKeys = it.toString(); status = "Arquivo prod.keys selecionado localmente." }
+        uri?.let {
+            try {
+                context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (_: Exception) { }
+            val result = runCatching { NativeLibrary.installKeys(it.toString(), "keys") }.getOrElse { -1 }
+            if (result == 0) {
+                persistUri("keys_uri", it)
+                selectedKeys = it.toString()
+                status = "prod.keys instalada e reconhecida pelo motor."
+                Toast.makeText(context, status, Toast.LENGTH_LONG).show()
+            } else {
+                status = "Falha ao instalar prod.keys (código $result). Verifique o arquivo."
+                Toast.makeText(context, status, Toast.LENGTH_LONG).show()
+            }
+        }
     }
     val driverPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { persistUri("driver_uri", it); selectedDriver = it.toString(); status = "Pacote de driver selecionado." }
@@ -92,7 +106,7 @@ fun ArceusApp() {
                         Spacer(Modifier.width(8.dp))
                         Text("ARCEUS", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
                     }
-                    Text("MOBILE  •  0.1.1", color = Muted, fontSize = 11.sp)
+                    Text("MOBILE  •  0.1.2", color = Muted, fontSize = 11.sp)
                     Spacer(Modifier.height(12.dp))
                     NavItem("Início", tab == "Início", Icons.Default.Home) { tab = "Início" }
                     NavItem("Configurações", tab == "Configurações", Icons.Default.Tune) { tab = "Configurações" }
@@ -112,7 +126,7 @@ fun ArceusApp() {
                         Text("Pokémon Legends: Arceus  •  Snapdragon 685", color = Muted, fontSize = 12.sp)
                     }
                     Surface(color = Color(0xFF263B31), shape = RoundedCornerShape(50)) {
-                        Text("BUILD 0.1.1", Modifier.padding(horizontal = 13.dp, vertical = 7.dp), color = Good, fontSize = 11.sp)
+                        Text("BUILD 0.1.2", Modifier.padding(horizontal = 13.dp, vertical = 7.dp), color = Good, fontSize = 11.sp)
                     }
                 }
 
@@ -138,7 +152,7 @@ fun ArceusApp() {
                                                 val uri = Uri.parse(selectedGame)
                                                 val title = uri.lastPathSegment?.substringAfterLast('/') ?: "Pokémon Legends: Arceus"
                                                 val game = Game(title = title, path = selectedGame!!)
-                                                navController.navigate(HomeNavigationDirections.actionGlobalEmulationActivity(game))
+                                                context.startActivity(game.launchIntent)
                                             }.onFailure {
                                                 Toast.makeText(context, "Não foi possível iniciar o jogo: ${it.message}", Toast.LENGTH_LONG).show()
                                             }

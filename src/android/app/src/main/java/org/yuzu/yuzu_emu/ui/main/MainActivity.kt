@@ -321,9 +321,12 @@ class MainActivity : AppCompatActivity(), ThemeProvider {
         val firstTimeSetup = PreferenceManager.getDefaultSharedPreferences(applicationContext)
             .getBoolean(Settings.PREF_FIRST_APP_LAUNCH, true)
 
-        if (firstTimeSetup && !homeViewModel.navigatedToSetup) {
-            navController.navigate(R.id.firstTimeSetupFragment)
-            homeViewModel.navigatedToSetup = true
+        // ARCEUS 0.1.2: não abrir o onboarding original do Eden.
+        if (firstTimeSetup) {
+            PreferenceManager.getDefaultSharedPreferences(applicationContext)
+                .edit()
+                .putBoolean(Settings.PREF_FIRST_APP_LAUNCH, false)
+                .apply()
         }
     }
 
