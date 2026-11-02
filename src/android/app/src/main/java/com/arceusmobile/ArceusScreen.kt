@@ -1,6 +1,9 @@
 package com.arceusmobile
 
 import org.yuzu.yuzu_emu.R
+import org.yuzu.yuzu_emu.NativeLibrary
+import org.yuzu.yuzu_emu.model.Game
+import android.widget.Toast
 
 import android.content.Intent
 import android.net.Uri
@@ -53,7 +56,10 @@ fun ArceusApp() {
     var fxaa by remember { mutableStateOf(prefs.getBoolean("fxaa", false)) }
     var shaderCache by remember { mutableStateOf(prefs.getBoolean("shader_cache", true)) }
     var fps by remember { mutableStateOf(prefs.getString("fps", "30 FPS") ?: "30 FPS") }
-    var status by remember { mutableStateOf("Interface pronta. O motor de execução ainda não está integrado.") }
+    var status by remember { mutableStateOf("ARCEUS pronto. Verifique chaves, firmware e jogo antes de iniciar.") }
+    val keysReady = remember { runCatching { NativeLibrary.areKeysPresent() }.getOrDefault(false) }
+    val firmwareReady = remember { runCatching { NativeLibrary.isFirmwareAvailable() }.getOrDefault(false) }
+    val gameReady = !selectedGame.isNullOrBlank()
 
     fun persistUri(key: String, uri: Uri) {
         try { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) } catch (_: Exception) {}
@@ -86,7 +92,7 @@ fun ArceusApp() {
                         Spacer(Modifier.width(8.dp))
                         Text("ARCEUS", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
                     }
-                    Text("MOBILE  •  0.1.0", color = Muted, fontSize = 11.sp)
+                    Text("MOBILE  •  0.1.1", color = Muted, fontSize = 11.sp)
                     Spacer(Modifier.height(12.dp))
                     NavItem("Início", tab == "Início", Icons.Default.Home) { tab = "Início" }
                     NavItem("Configurações", tab == "Configurações", Icons.Default.Tune) { tab = "Configurações" }
@@ -106,7 +112,7 @@ fun ArceusApp() {
                         Text("Pokémon Legends: Arceus  •  Snapdragon 685", color = Muted, fontSize = 12.sp)
                     }
                     Surface(color = Color(0xFF263B31), shape = RoundedCornerShape(50)) {
-                        Text("BUILD 0.1.0", Modifier.padding(horizontal = 13.dp, vertical = 7.dp), color = Good, fontSize = 11.sp)
+                        Text("BUILD 0.1.1", Modifier.padding(horizontal = 13.dp, vertical = 7.dp), color = Good, fontSize = 11.sp)
                     }
                 }
 
@@ -122,13 +128,37 @@ fun ArceusApp() {
                             Text("A aventura começa aqui.", fontSize = 22.sp, fontWeight = FontWeight.Bold)
                             Text("Central de preparação para Pokémon Legends: Arceus.", color = Muted)
                             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                Button(onClick = { tab = "Preparação" }) {
-                                    Icon(Icons.Default.RocketLaunch, null); Spacer(Modifier.width(7.dp)); Text("Preparar jogo")
+                                Button(
+                                    enabled = gameReady && keysReady,
+                                    onClick = {
+                                        if (selectedGame.isNullOrBlank()) {
+                                            tab = "Preparação"
+                                        } else {
+                                            runCatching {
+                                                val uri = Uri.parse(selectedGame)
+                                                val title = uri.lastPathSegment?.substringAfterLast('/') ?: "Pokémon Legends: Arceus"
+                                                val game = Game(title = title, path = selectedGame!!)
+                                                navController.navigate(HomeNavigationDirections.actionGlobalEmulationActivity(game))
+                                            }.onFailure {
+                                                Toast.makeText(context, "Não foi possível iniciar o jogo: ${it.message}", Toast.LENGTH_LONG).show()
+                                            }
+                                        }
+                                    }
+                                ) {
+                                    Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(7.dp)); Text("Jogar")
+                                }
+                                OutlinedButton(onClick = { tab = "Preparação" }) {
+                                    Icon(Icons.Default.FolderOpen, null); Spacer(Modifier.width(7.dp)); Text("Biblioteca / arquivos")
                                 }
                                 OutlinedButton(onClick = { tab = "Configurações" }) {
                                     Icon(Icons.Default.Tune, null); Spacer(Modifier.width(7.dp)); Text("Configurar")
                                 }
                             }
+                            Text(
+                                "Chaves: ${if (keysReady) "válidas" else "não detectadas"}  •  Firmware: ${if (firmwareReady) "instalado" else "não detectado"}",
+                                color = if (keysReady) Good else Color(0xFFFFD28A),
+                                fontSize = 12.sp
+                            )
                         }
                         CardBlock {
                             Text("Seus arquivos", fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -139,7 +169,7 @@ fun ArceusApp() {
                         CardBlock {
                             Text("Estado do projeto", fontWeight = FontWeight.Bold)
                             Text(status, color = Muted)
-                            Text("Esta versão organiza os arquivos e as preferências. A execução do jogo depende da integração do motor.", color = Color(0xFFFFD28A), fontSize = 12.sp)
+                            Text("A validação de chaves e firmware consulta o motor nativo. O jogo selecionado é encaminhado à atividade de emulação do Eden.", color = Muted, fontSize = 12.sp)
                         }
                     }
                     "Configurações" -> {
@@ -272,7 +302,7 @@ fun ArceusApp() {
                             onClick = { status = if (selectedGame != null && selectedKeys != null) "Arquivos selecionados. A validação técnica depende da integração do motor." else "Faltam arquivos obrigatórios: jogo e prod.keys." },
                             modifier = Modifier.fillMaxWidth()
                         ) { Text("Conferir arquivos selecionados") }
-                        Text("A seleção não confirma compatibilidade nem valida o conteúdo das chaves; isso será feito pelo runtime.", color = Muted, fontSize = 11.sp)
+                        Text("Estado nativo: chaves ${if (keysReady) "válidas" else "ausentes/inválidas"}; firmware ${if (firmwareReady) "instalado" else "não detectado"}. Selecionar um arquivo não instala chaves nem firmware.", color = Muted, fontSize = 11.sp)
                     }
                     "Conexão PC" -> {
                         CardBlock {
