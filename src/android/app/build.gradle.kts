@@ -43,6 +43,11 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     compileOptions {
@@ -331,6 +336,13 @@ play {
 }
 
 dependencies {
+    // ARCEUS Compose UI, compatible with Kotlin 1.9.20
+    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
@@ -351,8 +363,6 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
     implementation("info.debatty:java-string-similarity:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("androidx.compose.ui:ui-graphics-android:1.7.8")
-    implementation("androidx.compose.ui:ui-text-android:1.7.8")
     implementation("net.swiftzer.semver:semver:2.0.0")
 }
 
