@@ -4,6 +4,9 @@ import org.yuzu.yuzu_emu.R
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Parcelable
+import org.yuzu.yuzu_emu.features.settings.model.Settings
+import org.yuzu.yuzu_emu.features.settings.ui.SettingsActivity
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,10 +46,6 @@ fun ArceusApp() {
     var selectedKeys by remember { mutableStateOf(prefs.getString("keys_uri", null)) }
     var selectedDriver by remember { mutableStateOf(prefs.getString("driver_uri", null)) }
     var tab by remember { mutableStateOf("Início") }
-    var resolution by remember { mutableFloatStateOf(prefs.getFloat("resolution", 0.5f)) }
-    var fxaa by remember { mutableStateOf(prefs.getBoolean("fxaa", false)) }
-    var shaderCache by remember { mutableStateOf(prefs.getBoolean("shader_cache", true)) }
-    var fps by remember { mutableStateOf(prefs.getString("fps", "30 FPS") ?: "30 FPS") }
     var status by remember { mutableStateOf("Interface pronta. O motor de execução ainda não está integrado.") }
 
     fun persistUri(key: String, uri: Uri) {
@@ -78,7 +77,7 @@ fun ArceusApp() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.SportsEsports, null, tint = Purple, modifier = Modifier.size(27.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("ARCEUS", fontWeight = FontWeight.Black, fontSize = 20.sp)
+                        Text("ARCEUS", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
                     }
                     Text("MOBILE  •  0.2", color = Muted, fontSize = 11.sp)
                     Spacer(Modifier.height(12.dp))
@@ -138,33 +137,55 @@ fun ArceusApp() {
                     }
                     "Configurações" -> {
                         CardBlock {
-                            Text("Gráficos", fontWeight = FontWeight.Bold, fontSize = 19.sp)
-                            Text("Resolução interna: ${(resolution * 100).toInt()}%", color = Muted)
-                            Slider(value = resolution, onValueChange = {
-                                resolution = it; prefs.edit().putFloat("resolution", it).apply()
-                            }, valueRange = 0.25f..1f)
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("0,25x", color = Muted); Text("1,0x", color = Muted)
+                            Text("Configurações reais do emulador", fontWeight = FontWeight.Bold, fontSize = 19.sp)
+                            Text(
+                                "Essas opções abrem os painéis nativos do Eden. As alterações são aplicadas pelo próprio motor e salvas na configuração do emulador.",
+                                color = Muted
+                            )
+                            NativeSettingsButton(
+                                "Gráficos e desempenho",
+                                "Resolução, anti-aliasing, renderizador, VSync, filtros e opções de GPU."
+                            ) {
+                                openNativeSettings(context, Settings.MenuTag.SECTION_RENDERER)
                             }
-                            Divider(color = Color(0xFF514064))
-                            SettingSwitch("FXAA", "Suavização de serrilhado (quando suportada)", fxaa) {
-                                fxaa = it; prefs.edit().putBoolean("fxaa", it).apply()
+                            NativeSettingsButton(
+                                "Drivers e GPU",
+                                "Gerenciar drivers gráficos compatíveis e opções específicas do dispositivo."
+                            ) {
+                                openNativeSettings(context, Settings.MenuTag.SECTION_FREEDRENO)
                             }
-                            SettingSwitch("Cache de shaders", "Guardar shaders compilados", shaderCache) {
-                                shaderCache = it; prefs.edit().putBoolean("shader_cache", it).apply()
+                            NativeSettingsButton(
+                                "Sistema e compatibilidade",
+                                "CPU, precisão, região, idioma e opções do sistema."
+                            ) {
+                                openNativeSettings(context, Settings.MenuTag.SECTION_SYSTEM)
                             }
-                            Text("Renderizador Vulkan — depende do motor integrado.", color = Muted, fontSize = 12.sp)
+                            NativeSettingsButton(
+                                "Controles",
+                                "Mapeamento de botões, perfis e controles por toque."
+                            ) {
+                                openNativeSettings(context, Settings.MenuTag.SECTION_INPUT)
+                            }
+                            NativeSettingsButton(
+                                "Áudio",
+                                "Saída de áudio e opções disponíveis no runtime."
+                            ) {
+                                openNativeSettings(context, Settings.MenuTag.SECTION_AUDIO)
+                            }
+                            NativeSettingsButton(
+                                "Interface do emulador",
+                                "Idioma, tema e preferências do aplicativo."
+                            ) {
+                                openNativeSettings(context, Settings.MenuTag.SECTION_APP_SETTINGS)
+                            }
                         }
                         CardBlock {
-                            Text("Limite de quadros", fontWeight = FontWeight.Bold)
-                            Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                                listOf("30 FPS", "60 FPS", "Sem limite").forEach {
-                                    FilterChip(selected = fps == it, onClick = {
-                                        fps = it; prefs.edit().putString("fps", it).apply()
-                                    }, label = { Text(it) })
-                                }
-                            }
-                            Text("As opções serão aplicadas quando o runtime oferecer suporte.", color = Muted, fontSize = 11.sp)
+                            Text("Sobre as opções", fontWeight = FontWeight.Bold)
+                            Text(
+                                "A resolução interna, o método de anti-aliasing e o backend de renderização agora são controlados pelo motor Eden, não por preferências locais fictícias. Drivers dependem de compatibilidade com a GPU e com a versão do Android.",
+                                color = Muted,
+                                fontSize = 12.sp
+                            )
                         }
                     }
                     "Preparação" -> {
@@ -203,6 +224,42 @@ fun ArceusApp() {
                 }
                 Text("ARCEUS Mobile é um projeto independente e não é afiliado à Nintendo.", color = Muted, fontSize = 10.sp)
             }
+        }
+    }
+}
+
+private fun openNativeSettings(
+    context: android.content.Context,
+    menuTag: Settings.MenuTag
+) {
+    val intent = Intent(context, SettingsActivity::class.java).apply {
+        putExtra("menuTag", menuTag)
+        putExtra("game", null as Parcelable?)
+    }
+    context.startActivity(intent)
+}
+
+@Composable
+private fun NativeSettingsButton(
+    title: String,
+    description: String,
+    onClick: () -> Unit
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(title, color = Color.White, fontWeight = FontWeight.SemiBold)
+                Text(description, color = Muted, fontSize = 11.sp)
+            }
+            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Purple)
         }
     }
 }
