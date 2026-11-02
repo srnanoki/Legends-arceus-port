@@ -72,7 +72,7 @@ android {
         applicationId = "dev.eden.eden_emulator"
         minSdk = 24
         targetSdk = 36
-        versionName = "0.0.3"
+        versionName = "0.1.0"
         versionCode = autoVersion
 
         externalNativeBuild {

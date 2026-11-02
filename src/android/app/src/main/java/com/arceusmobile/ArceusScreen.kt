@@ -4,9 +4,6 @@ import org.yuzu.yuzu_emu.R
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Parcelable
-import org.yuzu.yuzu_emu.features.settings.model.Settings
-import org.yuzu.yuzu_emu.features.settings.ui.SettingsActivity
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +24,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.navigation.findNavController
+import org.yuzu.yuzu_emu.HomeNavigationDirections
+import org.yuzu.yuzu_emu.features.settings.model.Settings
+import org.yuzu.yuzu_emu.features.settings.ui.SettingsSubscreen
 
 private val Purple = Color(0xFFB78AF7)
 private val Deep = Color(0xFF100D18)
@@ -40,12 +42,17 @@ private val Good = Color(0xFF8FE0B0)
 @Composable
 fun ArceusApp() {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val navController = LocalView.current.findNavController()
     val prefs = remember { context.getSharedPreferences("arceus_prefs", 0) }
 
     var selectedGame by remember { mutableStateOf(prefs.getString("game_uri", null)) }
     var selectedKeys by remember { mutableStateOf(prefs.getString("keys_uri", null)) }
     var selectedDriver by remember { mutableStateOf(prefs.getString("driver_uri", null)) }
     var tab by remember { mutableStateOf("Início") }
+    var resolution by remember { mutableFloatStateOf(prefs.getFloat("resolution", 0.5f)) }
+    var fxaa by remember { mutableStateOf(prefs.getBoolean("fxaa", false)) }
+    var shaderCache by remember { mutableStateOf(prefs.getBoolean("shader_cache", true)) }
+    var fps by remember { mutableStateOf(prefs.getString("fps", "30 FPS") ?: "30 FPS") }
     var status by remember { mutableStateOf("Interface pronta. O motor de execução ainda não está integrado.") }
 
     fun persistUri(key: String, uri: Uri) {
@@ -79,7 +86,7 @@ fun ArceusApp() {
                         Spacer(Modifier.width(8.dp))
                         Text("ARCEUS", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
                     }
-                    Text("MOBILE  •  0.2", color = Muted, fontSize = 11.sp)
+                    Text("MOBILE  •  0.1.0", color = Muted, fontSize = 11.sp)
                     Spacer(Modifier.height(12.dp))
                     NavItem("Início", tab == "Início", Icons.Default.Home) { tab = "Início" }
                     NavItem("Configurações", tab == "Configurações", Icons.Default.Tune) { tab = "Configurações" }
@@ -99,7 +106,7 @@ fun ArceusApp() {
                         Text("Pokémon Legends: Arceus  •  Snapdragon 685", color = Muted, fontSize = 12.sp)
                     }
                     Surface(color = Color(0xFF263B31), shape = RoundedCornerShape(50)) {
-                        Text("BUILD 0.2", Modifier.padding(horizontal = 13.dp, vertical = 7.dp), color = Good, fontSize = 11.sp)
+                        Text("BUILD 0.1.0", Modifier.padding(horizontal = 13.dp, vertical = 7.dp), color = Good, fontSize = 11.sp)
                     }
                 }
 
@@ -137,55 +144,114 @@ fun ArceusApp() {
                     }
                     "Configurações" -> {
                         CardBlock {
-                            Text("Configurações reais do emulador", fontWeight = FontWeight.Bold, fontSize = 19.sp)
+                            Text("Configurações do emulador", fontWeight = FontWeight.Bold, fontSize = 19.sp)
                             Text(
-                                "Essas opções abrem os painéis nativos do Eden. As alterações são aplicadas pelo próprio motor e salvas na configuração do emulador.",
+                                "Abra os painéis nativos do Eden. As alterações feitas neles são salvas na configuração do emulador e aplicadas pelo próprio motor.",
                                 color = Muted
                             )
-                            NativeSettingsButton(
-                                "Gráficos e desempenho",
-                                "Resolução, anti-aliasing, renderizador, VSync, filtros e opções de GPU."
+                            Button(
+                                onClick = {
+                                    val action = HomeNavigationDirections.actionGlobalSettingsActivity(
+                                        null, Settings.MenuTag.SECTION_RENDERER
+                                    )
+                                    navController.navigate(action)
+                                }, modifier = Modifier.fillMaxWidth()
                             ) {
-                                openNativeSettings(context, Settings.MenuTag.SECTION_RENDERER)
+                                Icon(Icons.Default.Tune, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Gráficos e renderização")
                             }
-                            NativeSettingsButton(
-                                "Drivers e GPU",
-                                "Gerenciar drivers gráficos compatíveis e opções específicas do dispositivo."
+                            OutlinedButton(
+                                onClick = {
+                                    val action = HomeNavigationDirections.actionGlobalSettingsActivity(
+                                        null, Settings.MenuTag.SECTION_SYSTEM
+                                    )
+                                    navController.navigate(action)
+                                }, modifier = Modifier.fillMaxWidth()
                             ) {
-                                openNativeSettings(context, Settings.MenuTag.SECTION_FREEDRENO)
+                                Icon(Icons.Default.Settings, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Sistema e compatibilidade")
                             }
-                            NativeSettingsButton(
-                                "Sistema e compatibilidade",
-                                "CPU, precisão, região, idioma e opções do sistema."
+                            OutlinedButton(
+                                onClick = {
+                                    val action = HomeNavigationDirections.actionGlobalSettingsActivity(
+                                        null, Settings.MenuTag.SECTION_AUDIO
+                                    )
+                                    navController.navigate(action)
+                                }, modifier = Modifier.fillMaxWidth()
                             ) {
-                                openNativeSettings(context, Settings.MenuTag.SECTION_SYSTEM)
+                                Icon(Icons.Default.VolumeUp, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Áudio")
                             }
-                            NativeSettingsButton(
-                                "Controles",
-                                "Mapeamento de botões, perfis e controles por toque."
+                            OutlinedButton(
+                                onClick = {
+                                    val action = HomeNavigationDirections.actionGlobalSettingsActivity(
+                                        null, Settings.MenuTag.SECTION_INPUT
+                                    )
+                                    navController.navigate(action)
+                                }, modifier = Modifier.fillMaxWidth()
                             ) {
-                                openNativeSettings(context, Settings.MenuTag.SECTION_INPUT)
-                            }
-                            NativeSettingsButton(
-                                "Áudio",
-                                "Saída de áudio e opções disponíveis no runtime."
-                            ) {
-                                openNativeSettings(context, Settings.MenuTag.SECTION_AUDIO)
-                            }
-                            NativeSettingsButton(
-                                "Interface do emulador",
-                                "Idioma, tema e preferências do aplicativo."
-                            ) {
-                                openNativeSettings(context, Settings.MenuTag.SECTION_APP_SETTINGS)
+                                Icon(Icons.Default.Gamepad, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Controles")
                             }
                         }
                         CardBlock {
-                            Text("Sobre as opções", fontWeight = FontWeight.Bold)
+                            Text("Drivers gráficos", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                             Text(
-                                "A resolução interna, o método de anti-aliasing e o backend de renderização agora são controlados pelo motor Eden, não por preferências locais fictícias. Drivers dependem de compatibilidade com a GPU e com a versão do Android.",
-                                color = Muted,
-                                fontSize = 12.sp
+                                "Instale, selecione ou remova drivers usando o gerenciador nativo do Eden. A disponibilidade depende da GPU e do Android.",
+                                color = Muted
                             )
+                            Button(
+                                onClick = {
+                                    val action = HomeNavigationDirections.actionGlobalSettingsSubscreenActivity(
+                                        SettingsSubscreen.DRIVER_MANAGER, null
+                                    )
+                                    navController.navigate(action)
+                                }, modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.Memory, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Gerenciar drivers")
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    val action = HomeNavigationDirections.actionGlobalSettingsSubscreenActivity(
+                                        SettingsSubscreen.DRIVER_FETCHER, null
+                                    )
+                                    navController.navigate(action)
+                                }, modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.Download, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Buscar drivers compatíveis")
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    val action = HomeNavigationDirections.actionGlobalSettingsSubscreenActivity(
+                                        SettingsSubscreen.FREEDRENO_SETTINGS, null
+                                    )
+                                    navController.navigate(action)
+                                }, modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.Tune, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Opções Freedreno / Turnip")
+                            }
+                        }
+                        CardBlock {
+                            Text("Pós-processamento", fontWeight = FontWeight.Bold)
+                            Text("Filtros e opções adicionais disponibilizados pelo motor.", color = Muted)
+                            OutlinedButton(onClick = {
+                                val action = HomeNavigationDirections.actionGlobalSettingsActivity(
+                                    null, Settings.MenuTag.SECTION_POST_PROCESSING
+                                )
+                                navController.navigate(action)
+                            }, modifier = Modifier.fillMaxWidth()) {
+                                Text("Abrir opções de pós-processamento")
+                            }
                         }
                     }
                     "Preparação" -> {
@@ -224,42 +290,6 @@ fun ArceusApp() {
                 }
                 Text("ARCEUS Mobile é um projeto independente e não é afiliado à Nintendo.", color = Muted, fontSize = 10.sp)
             }
-        }
-    }
-}
-
-private fun openNativeSettings(
-    context: android.content.Context,
-    menuTag: Settings.MenuTag
-) {
-    val intent = Intent(context, SettingsActivity::class.java).apply {
-        putExtra("menuTag", menuTag)
-        putExtra("game", null as Parcelable?)
-    }
-    context.startActivity(intent)
-}
-
-@Composable
-private fun NativeSettingsButton(
-    title: String,
-    description: String,
-    onClick: () -> Unit
-) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(title, color = Color.White, fontWeight = FontWeight.SemiBold)
-                Text(description, color = Muted, fontSize = 11.sp)
-            }
-            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Purple)
         }
     }
 }
@@ -325,4 +355,3 @@ private fun SettingSwitch(title: String, subtitle: String, checked: Boolean, onC
         Switch(checked = checked, onCheckedChange = onChecked)
     }
 }
-
